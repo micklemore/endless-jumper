@@ -51,7 +51,7 @@ public class AudioManager : MonoBehaviour
 
 	void StartGameMusic()
 	{
-		//Play("GameMusic");
+		Play("GameMusic");
 	}
 
 	void GameOver()

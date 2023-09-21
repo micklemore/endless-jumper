@@ -222,7 +222,7 @@ MonoBehaviour:
   sounds:
   - clip: {fileID: 8300000, guid: 76a90bc50c0cbe24d83a3e7c8426e68a, type: 3}
     name: GameMusic
-    volume: 1
+    volume: 0.1
     pitch: 1
     source: {fileID: 0}
 --- !u!4 &219390005
