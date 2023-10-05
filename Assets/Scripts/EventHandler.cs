@@ -7,7 +7,7 @@ public class EventHandler : MonoBehaviour
 {
     public static EventHandler instance;
 
-	private void Awake()
+	void Awake()
 	{
 		if (instance != null)
         {
@@ -19,23 +19,17 @@ public class EventHandler : MonoBehaviour
     public delegate void IncrementScore(int score);
     public IncrementScore incrementScoreDelegate;
 
-    public void IncrementScoreNotify()
-    {
-        Debug.Log("Vado a notificare");
-        
-        incrementScoreDelegate?.Invoke(GameManager.instance.GetIncrementedScore());
+    public void IncrementScoreNotify(int score)
+    {        
+        incrementScoreDelegate?.Invoke(score);
     }
 
     public delegate void EndGameFinalScore(int finalScore);
     public EndGameFinalScore endGameDelegate;
 
-    public delegate void EndGameAudio();
-    public EndGameAudio endGameAudioDelegate;
-
     public void EndGameNotify()
     {
-        //endGameDelegate?.Invoke(GameManager.instance.GetCurrentScore());
-        endGameAudioDelegate?.Invoke();
+		endGameDelegate?.Invoke(GameManager.instance.GetCurrentScore());
     }
 
     public delegate void OnStartGame();

@@ -7,7 +7,7 @@ using UnityEngine;
 public class Obstacle : MonoBehaviour
 {
     [SerializeField]
-    float speed = 10;
+    float speed = 15;
 
 	void Update()
 	{

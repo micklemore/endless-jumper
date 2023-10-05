@@ -7,11 +7,24 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    float secondsToReturnToStartPosition = 3f;
+	[SerializeField]
+	float secondsToReturnToStartPosition = 3f;
+
+	[SerializeField]
+	float obstacleMinSpawnTimer = 2f;
+
+	[SerializeField]
+	float obstacleMaxSpawnTimer = 5f;
+
+	public float SecondsToReturnToStartPosition => secondsToReturnToStartPosition;
+
+	public float MinSpawnTimer => obstacleMinSpawnTimer;
+
+	public float MaxSpawnTimer => obstacleMaxSpawnTimer;
 
 	int currentScore = 0;
 
-	private void Awake()
+	void Awake()
 	{
 		if (instance != null)
 		{
@@ -20,15 +33,24 @@ public class GameManager : MonoBehaviour
 		instance = this;
 	}
 
-	private void Start()
+	void Start()
 	{
 		EventHandler.instance.StartGameNotify();
 		EventHandler.instance.restartGameClickedDelegate += RestartGame;
+		EventHandler.instance.endGameDelegate += EndGame;
 	}
 
 	public float GetSecondsToReturnToStartPosition()
 	{
 		return secondsToReturnToStartPosition;
+	}
+
+	public void IncrementScore()
+	{
+		Debug.Log("current score is " + currentScore);
+		currentScore++;
+		Debug.Log("current score now is " + currentScore);
+		EventHandler.instance.IncrementScoreNotify(currentScore);
 	}
 
 	public int GetIncrementedScore()
@@ -43,6 +65,12 @@ public class GameManager : MonoBehaviour
 
 	void RestartGame()
 	{
+		Time.timeScale = 1;
 		SceneManager.LoadScene(0);
+	}
+
+	void EndGame(int score)
+	{
+		Time.timeScale = 0;
 	}
 }

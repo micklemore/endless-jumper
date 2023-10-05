@@ -8,7 +8,10 @@ using UnityEngine.SceneManagement;
 public class UI : MonoBehaviour
 {
     [SerializeField]
-    GameObject gameOverScreen;
+    GameObject gameOverView;
+
+    [SerializeField]
+    GameObject gameView;
 
     [SerializeField]
     Text finalScoreText;
@@ -19,13 +22,20 @@ public class UI : MonoBehaviour
     [SerializeField]
 	Text timeText;
 
+    [SerializeField]
+    Button restartGameButton;
+
+	[SerializeField]
+	Button startGameButton;
+
+	[SerializeField]
+	Button quitGameButton;
+
 	string scoreLabel = "Current score: ";
     
     string timeLabel = "Game time: ";
 
     int startScore = 0;
-
-    string timeToShow;
 
 	float gameTime = 0f;
 
@@ -37,7 +47,14 @@ public class UI : MonoBehaviour
         EventHandler.instance.endGameDelegate += ShowGameOverScreen;
     }
 
-    void Update()
+	void OnEnable()
+	{
+        startGameButton.onClick.AddListener(StartGameButtonPressed);
+        quitGameButton.onClick.AddListener(QuitGameButtonPressed);
+        restartGameButton.onClick.AddListener(RestartGameClicked);
+	}
+
+	void Update()
     {
         UpdateGameTime();
 	}
@@ -45,7 +62,6 @@ public class UI : MonoBehaviour
     void IncrementScore(int score)
     {
         SetScoreText(scoreLabel + score);
-        Debug.Log("punteggio: " + score);
     }
 
     void SetScoreText(string text)
@@ -74,11 +90,22 @@ public class UI : MonoBehaviour
 
     void ShowGameOverScreen(int finalScore)
     {
-        gameOverScreen.SetActive(true);
+        gameView.SetActive(false);
+        gameOverView.SetActive(true);
         finalScoreText.text = "Final Score: " + finalScore;
     }
 
-    public void RestartGameClicked()
+    void StartGameButtonPressed()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    void QuitGameButtonPressed()
+    {
+        Application.Quit();
+    }
+
+	public void RestartGameClicked()
     {
         EventHandler.instance.OnRestartGameClicked();
     }

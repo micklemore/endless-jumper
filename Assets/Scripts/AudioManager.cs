@@ -6,15 +6,25 @@ using UnityEngine;
 using UnityEngine.Audio;
 
 public class AudioManager : MonoBehaviour
-{
+{ 
 	[SerializeField]
-	Sound[] sounds;
+	AudioSource gameMusicAudioSource;
+
+	[SerializeField]
+	AudioSource jumpAudioSource;
+
+	[SerializeField]
+	AudioSource hurtAudioSource;
+
+	[SerializeField]
+	AudioSource gameOverAudioSource;
+
+	[SerializeField]
+	AudioSource deathAudioSource;
 
 	public static AudioManager instance;
 
-	Sound currentAudioPlaying = null;
-
-	private void Awake()
+	void Awake()
 	{
 		if (instance != null)
 		{
@@ -23,47 +33,42 @@ public class AudioManager : MonoBehaviour
 		instance = this;
 	}
 
-	private void Start()
+	void Start()
 	{
-		InitializeSounds();
-
 		EventHandler.instance.startGameDelegate += StartGameMusic;
-		EventHandler.instance.endGameAudioDelegate += GameOver;
-	}
-
-	void InitializeSounds()
-	{
-		foreach (Sound s in sounds)
-		{
-			s.source = gameObject.AddComponent<AudioSource>();
-			s.source.volume = s.volume;
-			s.source.pitch = s.pitch;
-			s.source.clip = s.clip;
-		}
-	}
-	void Play(string name)
-	{
-		//find in sounds, return a sound that have name equals to name
-		Sound s = Array.Find(sounds, sound => sound.name == name);
-		currentAudioPlaying = s;
-		s.source.Play();
+		EventHandler.instance.endGameDelegate += StopGameMusic;
 	}
 
 	void StartGameMusic()
 	{
-		Play("GameMusic");
+		gameMusicAudioSource.PlayOneShot(gameMusicAudioSource.clip, gameMusicAudioSource.volume);
 	}
 
-	void GameOver()
+	void StopAllMusic()
 	{
-		StopCurrentAudio();
+		gameMusicAudioSource.Stop();
+		jumpAudioSource.Stop();
+		hurtAudioSource.Stop();
+		deathAudioSource.Stop();
+	}
+	void StopGameMusic(int score)
+	{
+		StopAllMusic();
+		gameOverAudioSource.PlayOneShot(gameOverAudioSource.clip, gameOverAudioSource.volume);
 	}
 
-	void StopCurrentAudio()
+	public void PlayJumpAudio()
 	{
-		if (currentAudioPlaying != null)
-		{
-			currentAudioPlaying.source.Stop();
-		}
+		jumpAudioSource.PlayOneShot(jumpAudioSource.clip, jumpAudioSource.volume);
+	}
+
+	public void PlayHurtAudio()
+	{
+		hurtAudioSource.PlayOneShot(hurtAudioSource.clip, hurtAudioSource.volume);
+	}
+
+	public void PlayDeathAudio()
+	{
+		deathAudioSource.PlayOneShot(deathAudioSource.clip, deathAudioSource.volume);
 	}
 }

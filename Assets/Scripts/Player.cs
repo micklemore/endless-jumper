@@ -34,147 +34,188 @@ public class Player : MonoBehaviour
 
 	bool haveToRaycast = false;
 
+	bool lastRaycastHit = false;
+
 	float startGravity;
 
-	IEnumerator shiftPlayerBackCoroutine;
+	bool isFalling = false;
 
-    IEnumerator shiftPlayerForwardCoroutine;
+	bool playHitAnimation = false;
 
-    IEnumerator waitToComeBackCoroutine;
+	Animator playerAnimator;
 
-	IEnumerator endGameCoroutine;
-
-	private void Start()
+	void Start()
 	{
 		rigidBody2d = GetComponent<Rigidbody2D>();
-		startGravity = rigidBody2d.gravityScale;
 
-		//initialize coroutines
-		shiftPlayerBackCoroutine = ShiftPlayerBackCoroutine();
-        shiftPlayerForwardCoroutine = ShiftPlayerForwardCoroutine();
-        waitToComeBackCoroutine = WaitToComeBackCoroutine();
-		endGameCoroutine = EndGameCoroutine();
+		playerAnimator = GetComponent<Animator>();
+
+		startGravity = rigidBody2d.gravityScale;
 	}
 
-	private void Update()
+	void Update()
 	{
+		CheckIfFalling();
+
+		SetAnimatorParameters();
+
 		TryToJump();
+
+		CheckRayTrace();
 
 		CheckPlayerShift();
 
-		CheckRayTrace();
-		Debug.DrawLine(transform.position, (Vector2)transform.position + Vector2.down * 10, Color.blue);
+		
+	}
+
+	void CheckIfFalling()
+	{
+		if (rigidBody2d.velocity.y < -0.1) { 
+			isFalling = true;
+		}
+		else
+		{
+			isFalling = false;
+		}
+	}
+
+	void SetAnimatorParameters()
+	{
+		playerAnimator.SetBool("IsJumping", isJumping);
+		playerAnimator.SetBool("IsFalling", isFalling);
+		playerAnimator.SetBool("IsHit", playHitAnimation);
+		playerAnimator.SetBool("IsReturningToStart", haveToShiftPlayerForward);
 	}
 
 	void CheckRayTrace()
 	{
-		if (isJumping && haveToRaycast)
+		if (isJumping)
 		{
 			PerformRaycast();
+		}
+		else
+		{
+			lastRaycastHit = false;
 		}
 	}
 
 	void PerformRaycast()
 	{
-		RaycastHit2D hit = Physics2D.Raycast(transform.position, (Vector2)transform.position + Vector2.down);
-
-		if (hit.collider != null && hit.collider.gameObject.GetComponent<Obstacle>())
+		Debug.DrawLine(transform.position, (Vector2)transform.position + Vector2.down * 10, Color.blue);
+		RaycastHit2D hit = Physics2D.Raycast((Vector2)transform.position, (Vector2)transform.position + Vector2.down);
+		
+		if (hit.collider != null)
 		{
-			haveToRaycast = false;
-			Debug.Log("Ho saltato un " + hit.collider.name);
-			EventHandler.instance.IncrementScoreNotify();
+			Debug.Log("collider != null");
+			if (hit.collider.gameObject.GetComponent<Obstacle>() != null)
+			{
+				lastRaycastHit = true;
+				Debug.Log("raycast with obstacle");
+			}
+			else
+			{
+				Debug.Log("non ho fatto collision con obstacle");
+				if (lastRaycastHit)
+				{
+					haveToRaycast = false;
+					lastRaycastHit = false;
+					GameManager.instance.IncrementScore();
+				}
+			}
 		}
 	}
 
     void CheckPlayerShift()
     {
-        if (haveToShiftPlayerBack)
-        {
-            ShiftPlayerBack();
-        }
-        if (haveToShiftPlayerForward)
-        {
-            ShiftPlayerForward();
-        }
-		if(haveToShiftPlayerToDeath)
+		if (haveToShiftPlayerToDeath)
 		{
 			ShiftPlayerToDeath();
 		}
+		else if (haveToShiftPlayerBack)
+        {
+            ShiftPlayerBack();
+        }
+        else if (haveToShiftPlayerForward)
+        {
+            ShiftPlayerForward();
+        }
     }
 
 	void TryToJump()
 	{
-		if (Input.GetKeyDown("space"))
+		if (!isJumping)
 		{
-			if (!isJumping)
+			if (Input.GetKeyDown(KeyCode.Space))
 			{
 				rigidBody2d.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+				AudioManager.instance.PlayJumpAudio();
 				isJumping = true;
 				haveToRaycast = true;
-				Debug.Log("jumping");
-			}
-			else
+			} 
+		}
+		else
+		{
+			if (Input.GetKeyDown(KeyCode.Space))
 			{
 				rigidBody2d.gravityScale = startGravity + 5;
+			}
+			if (Input.GetKeyUp(KeyCode.Space))
+			{
+				rigidBody2d.gravityScale = startGravity;
 			}
 		}
 	}
 
 	IEnumerator ShiftPlayerBackCoroutine()
     {
-        Debug.Log("torno indietro");
-
+		AudioManager.instance.PlayHurtAudio();
+		playHitAnimation = true;
 		haveToShiftPlayerBack = true;
 
         yield return new WaitForSeconds(speed);
 
+		playHitAnimation = false;
         haveToShiftPlayerBack = false;
 
-        Debug.Log("haveToShiftPlayerBack a false");
-
-		StartCoroutine(waitToComeBackCoroutine);
+		StartCoroutine(WaitToComeBackCoroutine());
     }
+
+	IEnumerator WaitToComeBackCoroutine()
+    {		
+        yield return new WaitForSeconds(GameManager.instance.SecondsToReturnToStartPosition);
+
+        StartCoroutine(ShiftPlayerForwardCoroutine());
+	}
 
     IEnumerator ShiftPlayerForwardCoroutine()
     {
-		Debug.Log("torno avanti");
-
 		haveToShiftPlayerForward = true;
+
+		isFirstHit = true;
 
 		yield return new WaitForSeconds(speed);
 
 		haveToShiftPlayerForward = false;
-
-		Debug.Log("first hit valeva: " + isFirstHit);
-
-		isFirstHit = true;
-
-		Debug.Log("ora vale: " + isFirstHit);
 	}
 
-    IEnumerator WaitToComeBackCoroutine()
-    {
-		Debug.Log("attendo..");
-		
-        yield return new WaitForSeconds(GameManager.instance.GetSecondsToReturnToStartPosition());
-
-        StartCoroutine(shiftPlayerForwardCoroutine);
-	}
+    
 
 	IEnumerator EndGameCoroutine()
 	{
+		AudioManager.instance.PlayDeathAudio();
+		playHitAnimation = true;
 		haveToShiftPlayerToDeath = true;
 
 		haveToShiftPlayerForward = false;
 
+		haveToRaycast = false;
+
 		yield return new WaitForSeconds(speed);
 
+		playHitAnimation = false;
 		haveToShiftPlayerToDeath = false;
 
 		EventHandler.instance.EndGameNotify();
-
-		//to stop game
-		Time.timeScale = 0;
 	}
 
     void ShiftPlayerBack()
@@ -198,30 +239,27 @@ public class Player : MonoBehaviour
 													transform.position.z);
 	}
 
-	void OnTriggerEnter2D(Collider2D collision)
-	{
-        Debug.Log("Collision");
-		if (collision.gameObject.GetComponent<Obstacle>() != null)
-        {
-			Debug.Log("è un obstacle");
-			if (isFirstHit)
-            {
-				
-				isFirstHit = false;
-				Debug.Log("è la prima hit, ora setto isFirstHit a: " + isFirstHit); 
-				StartCoroutine(shiftPlayerBackCoroutine);
-            }
-            else
-            {
-                GameOver();
-            }
-        }
-	}
-
     void GameOver()
     {
 		StopAllCoroutines();
-		StartCoroutine(endGameCoroutine);
+		StartCoroutine(EndGameCoroutine());
+	}
+
+	void OnTriggerEnter2D(Collider2D collision)
+	{
+		if (collision.gameObject.GetComponent<Obstacle>() != null)
+        {
+			//haveToRaycast = false;
+			if (isFirstHit)
+            {	
+				isFirstHit = false;
+				StartCoroutine(ShiftPlayerBackCoroutine());
+            }
+            else
+            {
+				GameOver();
+            }
+        }
 	}
 
 	void OnCollisionEnter2D(Collision2D other)

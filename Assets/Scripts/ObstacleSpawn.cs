@@ -11,19 +11,13 @@ public class ObstacleSpawn : MonoBehaviour
 	[SerializeField]
 	GameObject obstacle;
 
-	[SerializeField]
-    float minSpawnTimer = 2f;
-
-	[SerializeField]
-	float maxSpawnTimer = 5f;
-
 	float currentTimer = 0;
 
 	float timeToSpawn;
 
 	void Start()
 	{
-		timeToSpawn = Random.Range(minSpawnTimer, maxSpawnTimer);
+		timeToSpawn = Random.Range(GameManager.instance.MinSpawnTimer, GameManager.instance.MaxSpawnTimer);
 	}
 
 	void Update()
@@ -38,15 +32,13 @@ public class ObstacleSpawn : MonoBehaviour
         if (currentTimer >= timeToSpawn)
         {
 			SpawnObstacle();
-			timeToSpawn = Random.Range(minSpawnTimer, maxSpawnTimer);
+			timeToSpawn = Random.Range(GameManager.instance.MinSpawnTimer, GameManager.instance.MaxSpawnTimer);
 			currentTimer = 0;
 		}
     }
 
 	void SpawnObstacle()
 	{
-		Debug.Log("Spawned obstacle after " + timeToSpawn + " seconds");
 		Instantiate(obstacle, obstacleSpawnPoint.transform.position, Quaternion.identity);
 	}
-
 }
