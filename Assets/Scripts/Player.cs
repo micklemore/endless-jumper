@@ -40,8 +40,6 @@ public class Player : MonoBehaviour
 
 	bool isFalling = false;
 
-	bool playHitAnimation = false;
-
 	Animator playerAnimator;
 
 	void Start()
@@ -57,41 +55,36 @@ public class Player : MonoBehaviour
 	{
 		CheckIfFalling();
 
-		SetAnimatorParameters();
-
 		TryToJump();
 
-		CheckRayTrace();
+		CheckIfRayTraceIsNeededToDetectObstacles();
 
-		CheckPlayerShift();
-
-		
+		CheckIfPlayerHasToBeShift();
 	}
 
 	void CheckIfFalling()
 	{
 		if (rigidBody2d.velocity.y < -0.1) { 
 			isFalling = true;
+			SetAnimatorParameter("IsFalling", isFalling);
 		}
 		else
 		{
 			isFalling = false;
+			SetAnimatorParameter("IsFalling", isFalling);
 		}
 	}
 
-	void SetAnimatorParameters()
+	void SetAnimatorParameter(string parameter, bool value)
 	{
-		playerAnimator.SetBool("IsJumping", isJumping);
-		playerAnimator.SetBool("IsFalling", isFalling);
-		playerAnimator.SetBool("IsHit", playHitAnimation);
-		playerAnimator.SetBool("IsReturningToStart", haveToShiftPlayerForward);
+		playerAnimator.SetBool(parameter, value);
 	}
 
-	void CheckRayTrace()
+	void CheckIfRayTraceIsNeededToDetectObstacles()
 	{
-		if (isJumping)
+		if (isJumping && haveToRaycast)
 		{
-			PerformRaycast();
+			PerformRaycastToDetectObstacles();
 		}
 		else
 		{
@@ -99,7 +92,7 @@ public class Player : MonoBehaviour
 		}
 	}
 
-	void PerformRaycast()
+	void PerformRaycastToDetectObstacles()
 	{
 		Debug.DrawLine(transform.position, (Vector2)transform.position + Vector2.down * 10, Color.blue);
 		RaycastHit2D hit = Physics2D.Raycast((Vector2)transform.position, (Vector2)transform.position + Vector2.down);
@@ -125,7 +118,7 @@ public class Player : MonoBehaviour
 		}
 	}
 
-    void CheckPlayerShift()
+    void CheckIfPlayerHasToBeShift()
     {
 		if (haveToShiftPlayerToDeath)
 		{
@@ -147,9 +140,8 @@ public class Player : MonoBehaviour
 		{
 			if (Input.GetKeyDown(KeyCode.Space))
 			{
-				rigidBody2d.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-				AudioManager.instance.PlayJumpAudio();
-				isJumping = true;
+				Jump();
+				
 				haveToRaycast = true;
 			} 
 		}
@@ -169,13 +161,13 @@ public class Player : MonoBehaviour
 	IEnumerator ShiftPlayerBackCoroutine()
     {
 		AudioManager.instance.PlayHurtAudio();
-		playHitAnimation = true;
+		SetAnimatorParameter("IsHit", true);
 		haveToShiftPlayerBack = true;
 
         yield return new WaitForSeconds(speed);
 
-		playHitAnimation = false;
-        haveToShiftPlayerBack = false;
+		SetAnimatorParameter("IsHit", false);
+		haveToShiftPlayerBack = false;
 
 		StartCoroutine(WaitToComeBackCoroutine());
     }
@@ -190,29 +182,31 @@ public class Player : MonoBehaviour
     IEnumerator ShiftPlayerForwardCoroutine()
     {
 		haveToShiftPlayerForward = true;
+		SetAnimatorParameter("IsReturningToStart", haveToShiftPlayerForward);
 
 		isFirstHit = true;
 
 		yield return new WaitForSeconds(speed);
 
 		haveToShiftPlayerForward = false;
+		SetAnimatorParameter("IsReturningToStart", haveToShiftPlayerForward);
 	}
 
     
-
 	IEnumerator EndGameCoroutine()
 	{
 		AudioManager.instance.PlayDeathAudio();
-		playHitAnimation = true;
+		SetAnimatorParameter("IsHit", true);
 		haveToShiftPlayerToDeath = true;
 
 		haveToShiftPlayerForward = false;
+		SetAnimatorParameter("IsReturningToStart", haveToShiftPlayerForward);
 
 		haveToRaycast = false;
 
 		yield return new WaitForSeconds(speed);
 
-		playHitAnimation = false;
+		SetAnimatorParameter("IsHit", false);
 		haveToShiftPlayerToDeath = false;
 
 		EventHandler.instance.EndGameNotify();
@@ -245,11 +239,26 @@ public class Player : MonoBehaviour
 		StartCoroutine(EndGameCoroutine());
 	}
 
+	void Jump()
+	{
+		rigidBody2d.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+		isJumping = true;
+		SetAnimatorParameter("IsJumping", isJumping);
+		AudioManager.instance.PlayJumpAudio();
+	}
+
+	void Landed()
+	{
+		isJumping = false;
+		SetAnimatorParameter("IsJumping", isJumping);
+		rigidBody2d.gravityScale = startGravity;
+	}
+
 	void OnTriggerEnter2D(Collider2D collision)
 	{
 		if (collision.gameObject.GetComponent<Obstacle>() != null)
         {
-			//haveToRaycast = false;
+			haveToRaycast = false;
 			if (isFirstHit)
             {	
 				isFirstHit = false;
@@ -266,9 +275,9 @@ public class Player : MonoBehaviour
 	{
 		if (other.gameObject.CompareTag("Ground"))
 		{
-			isJumping = false;
+			Landed();
+
 			haveToRaycast = false;
-			rigidBody2d.gravityScale = startGravity;
 		}
 	}
 }

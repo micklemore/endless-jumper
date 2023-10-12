@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class UI : MonoBehaviour
 {
@@ -14,24 +15,24 @@ public class UI : MonoBehaviour
     GameObject gameView;
 
     [SerializeField]
-    Text finalScoreText;
+	TextMeshProUGUI finalScoreText;
 
     [SerializeField]
-    Text scoreText;
+	TextMeshProUGUI scoreText;
 
     [SerializeField]
-	Text timeText;
+	TextMeshProUGUI timeText;
 
     [SerializeField]
     Button restartGameButton;
 
-	[SerializeField]
-	Button startGameButton;
+    [SerializeField]
+    Button pauseButton;
 
-	[SerializeField]
-	Button quitGameButton;
+    [SerializeField]
+    GameObject pauseMenu;
 
-	string scoreLabel = "Current score: ";
+	string scoreLabel = "Score: ";
     
     string timeLabel = "Game time: ";
 
@@ -49,9 +50,8 @@ public class UI : MonoBehaviour
 
 	void OnEnable()
 	{
-        startGameButton.onClick.AddListener(StartGameButtonPressed);
-        quitGameButton.onClick.AddListener(QuitGameButtonPressed);
         restartGameButton.onClick.AddListener(RestartGameClicked);
+        pauseButton.onClick.AddListener(PauseButtonClicked);
 	}
 
 	void Update()
@@ -95,18 +95,14 @@ public class UI : MonoBehaviour
         finalScoreText.text = "Final Score: " + finalScore;
     }
 
-    void StartGameButtonPressed()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-    }
-
-    void QuitGameButtonPressed()
-    {
-        Application.Quit();
-    }
-
 	public void RestartGameClicked()
     {
         EventHandler.instance.OnRestartGameClicked();
     }
+
+    void PauseButtonClicked()
+    {
+		EventHandler.instance.OnPauseButtonClicked();
+        pauseMenu.SetActive(true);
+	}
 }

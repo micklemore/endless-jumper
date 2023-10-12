@@ -24,6 +24,14 @@ public class AudioManager : MonoBehaviour
 
 	public static AudioManager instance;
 
+	AudioSource actualAudioSource;
+
+	AudioSource gameMusic;
+
+	bool shouldPlayGameMusic = true;
+
+	bool shouldPlayEffectsAudio = true;
+
 	void Awake()
 	{
 		if (instance != null)
@@ -35,40 +43,58 @@ public class AudioManager : MonoBehaviour
 
 	void Start()
 	{
-		EventHandler.instance.startGameDelegate += StartGameMusic;
-		EventHandler.instance.endGameDelegate += StopGameMusic;
+		EventHandler.instance.startGameDelegate += PlayGameMusic;
+		EventHandler.instance.endGameDelegate += PlayGameOverAudio;
+
+		shouldPlayGameMusic = PlayerPrefs.GetInt("GameAudio") == 1;
+		shouldPlayEffectsAudio = PlayerPrefs.GetInt("EffectsAudio") == 1;
 	}
 
-	void StartGameMusic()
+	void PlayGameMusic()
 	{
-		gameMusicAudioSource.PlayOneShot(gameMusicAudioSource.clip, gameMusicAudioSource.volume);
+		if (shouldPlayGameMusic)
+		{
+			gameMusic = Instantiate(gameMusicAudioSource, new Vector3(0, 0, 0), Quaternion.identity);
+			gameMusic.Play();
+		}
 	}
 
-	void StopAllMusic()
+	void PlayGameOverAudio(int score)
 	{
-		gameMusicAudioSource.Stop();
-		jumpAudioSource.Stop();
-		hurtAudioSource.Stop();
-		deathAudioSource.Stop();
-	}
-	void StopGameMusic(int score)
-	{
-		StopAllMusic();
-		gameOverAudioSource.PlayOneShot(gameOverAudioSource.clip, gameOverAudioSource.volume);
+        if (shouldPlayGameMusic)
+        {
+			Destroy(gameMusic.gameObject);
+			PlaySpecificAudioSource(gameOverAudioSource);
+		}
 	}
 
 	public void PlayJumpAudio()
 	{
-		jumpAudioSource.PlayOneShot(jumpAudioSource.clip, jumpAudioSource.volume);
+		if (shouldPlayEffectsAudio)
+		{
+			PlaySpecificAudioSource(jumpAudioSource);
+		}
 	}
 
 	public void PlayHurtAudio()
 	{
-		hurtAudioSource.PlayOneShot(hurtAudioSource.clip, hurtAudioSource.volume);
+		if (shouldPlayEffectsAudio)
+		{
+			PlaySpecificAudioSource(hurtAudioSource);
+		}
 	}
 
 	public void PlayDeathAudio()
 	{
-		deathAudioSource.PlayOneShot(deathAudioSource.clip, deathAudioSource.volume);
+		if (shouldPlayEffectsAudio)
+		{
+			PlaySpecificAudioSource(deathAudioSource);
+		}
+	}
+
+	void PlaySpecificAudioSource(AudioSource audioSource)
+	{
+		actualAudioSource = Instantiate(audioSource, new Vector3(0, 0, 0), Quaternion.identity);
+		actualAudioSource.PlayOneShot(audioSource.clip, audioSource.volume);
 	}
 }

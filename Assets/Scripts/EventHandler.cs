@@ -47,4 +47,20 @@ public class EventHandler : MonoBehaviour
     {
         restartGameClickedDelegate?.Invoke();
     }
+
+    public delegate void PauseButtonClicked();
+    public PauseButtonClicked pauseButtonClickedDelegate;
+
+    public void OnPauseButtonClicked()
+    {
+        pauseButtonClickedDelegate?.Invoke();
+	}
+
+    public delegate void ResumeButtonClicked();
+    public ResumeButtonClicked resumeButtonClickedDelegate;
+
+    public void OnResumeButtonClicked()
+    {
+        resumeButtonClickedDelegate?.Invoke();
+    }
 }
