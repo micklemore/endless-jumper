@@ -32,6 +32,14 @@ public class UI : MonoBehaviour
     [SerializeField]
     GameObject pauseMenu;
 
+    [SerializeField]
+    Button optionsButton;
+
+    [SerializeField]
+    GameObject optionsMenu;
+
+    public static UI instance;
+
 	string scoreLabel = "Score: ";
     
     string timeLabel = "Game time: ";
@@ -40,18 +48,28 @@ public class UI : MonoBehaviour
 
 	float gameTime = 0f;
 
+	void Awake()
+	{
+		if (instance != null)
+        {
+            Destroy(this);
+        }
+        instance = this;
+	}
+
 	void Start()
     {
         SetScoreText(scoreLabel + startScore);
 
         EventHandler.instance.incrementScoreDelegate += IncrementScore;
         EventHandler.instance.endGameDelegate += ShowGameOverScreen;
-    }
+	}
 
 	void OnEnable()
 	{
         restartGameButton.onClick.AddListener(RestartGameClicked);
         pauseButton.onClick.AddListener(PauseButtonClicked);
+        optionsButton.onClick.AddListener(OptionsButtonClicked);
 	}
 
 	void Update()
@@ -105,4 +123,22 @@ public class UI : MonoBehaviour
 		EventHandler.instance.OnPauseButtonClicked();
         pauseMenu.SetActive(true);
 	}
+
+    public void ResumeButtonClicked()
+    {
+		EventHandler.instance.OnResumeButtonClicked();
+		pauseMenu.SetActive(false);
+	}
+
+    void OptionsButtonClicked()
+    {
+        pauseMenu.SetActive(false);
+        optionsMenu.SetActive(true);
+    }
+
+    public void OnBackButtonPressed()
+    {
+        optionsMenu.SetActive(false);
+        pauseMenu.SetActive(true);
+    }
 }

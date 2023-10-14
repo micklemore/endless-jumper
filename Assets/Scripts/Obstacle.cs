@@ -13,6 +13,7 @@ public class Obstacle : MonoBehaviour
 	{
 		MoveObstacle();
 	}
+
 	void OnBecameInvisible()
     {
         Destroy(gameObject);
@@ -20,6 +21,6 @@ public class Obstacle : MonoBehaviour
 
     void MoveObstacle()
     {
-        gameObject.transform.position -= Vector3.right * speed * Time.deltaTime;
+        transform.position -= Vector3.right * speed * Time.deltaTime;
     }
 }

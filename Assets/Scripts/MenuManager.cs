@@ -27,8 +27,7 @@ public class MenuManager : MonoBehaviour
 
 	void OnEnable()
 	{
-        optionsButton.onClick.AddListener(OptionsMenuClicked);
-        
+		optionsButton.onClick.AddListener(OptionsMenuClicked);
 	}
 
 	void OnDisable()
@@ -38,7 +37,7 @@ public class MenuManager : MonoBehaviour
 
 	void Start()
     {
-		PlayerPrefs.SetInt("GameAudio", 1);
+		PlayerPrefs.SetInt("GameMusic", 1);
 		PlayerPrefs.SetInt("EffectsAudio", 1);
 	}
 
@@ -52,7 +51,5 @@ public class MenuManager : MonoBehaviour
     {
 		optionsMenu.SetActive(false);
 		mainMenu.SetActive(true);
-
-		Debug.Log("game audio is " + PlayerPrefs.GetInt("GameAudio") + " and effects audio is " + PlayerPrefs.GetInt("EffectsAudio"));
 	}
 }

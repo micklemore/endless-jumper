@@ -19,6 +19,11 @@ public class GroundScroller : MonoBehaviour
     void Update()
     {
 		offset += (Time.deltaTime * scrollSpeed) / 10f;
+		ScrollMaterial();
+	}
+
+	void ScrollMaterial()
+	{
 		material.SetTextureOffset("_MainTex", new Vector2(offset, 0));
 	}
 }

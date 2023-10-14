@@ -21,7 +21,6 @@ public class PauseMenu : MonoBehaviour
 
 	void ResumeButtonClicked()
 	{
-		EventHandler.instance.OnResumeButtonClicked();
-		gameObject.SetActive(false);
+		UI.instance.ResumeButtonClicked();
 	}
 }

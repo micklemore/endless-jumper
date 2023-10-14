@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
 
 	bool isFirstHit = true;
 
-    float speed = 1f;
+    float playerShiftSpeed = 1f;
 
     bool haveToShiftPlayerBack = false;
 
@@ -99,15 +99,15 @@ public class Player : MonoBehaviour
 		
 		if (hit.collider != null)
 		{
-			Debug.Log("collider != null");
+			//Debug.Log("collider != null");
 			if (hit.collider.gameObject.GetComponent<Obstacle>() != null)
 			{
 				lastRaycastHit = true;
-				Debug.Log("raycast with obstacle");
+				//Debug.Log("raycast with obstacle");
 			}
 			else
 			{
-				Debug.Log("non ho fatto collision con obstacle");
+				//Debug.Log("non ho fatto collision con obstacle");
 				if (lastRaycastHit)
 				{
 					haveToRaycast = false;
@@ -164,7 +164,7 @@ public class Player : MonoBehaviour
 		SetAnimatorParameter("IsHit", true);
 		haveToShiftPlayerBack = true;
 
-        yield return new WaitForSeconds(speed);
+        yield return new WaitForSeconds(playerShiftSpeed);
 
 		SetAnimatorParameter("IsHit", false);
 		haveToShiftPlayerBack = false;
@@ -186,7 +186,7 @@ public class Player : MonoBehaviour
 
 		isFirstHit = true;
 
-		yield return new WaitForSeconds(speed);
+		yield return new WaitForSeconds(playerShiftSpeed);
 
 		haveToShiftPlayerForward = false;
 		SetAnimatorParameter("IsReturningToStart", haveToShiftPlayerForward);
@@ -204,7 +204,7 @@ public class Player : MonoBehaviour
 
 		haveToRaycast = false;
 
-		yield return new WaitForSeconds(speed);
+		yield return new WaitForSeconds(playerShiftSpeed);
 
 		SetAnimatorParameter("IsHit", false);
 		haveToShiftPlayerToDeath = false;
@@ -214,21 +214,21 @@ public class Player : MonoBehaviour
 
     void ShiftPlayerBack()
     {
-		transform.position = new Vector3(Mathf.Lerp(transform.position.x, backPoint.transform.position.x, Time.deltaTime * speed), 
+		transform.position = new Vector3(Mathf.Lerp(transform.position.x, backPoint.transform.position.x, Time.deltaTime * playerShiftSpeed), 
                                                     transform.position.y,
                                                     transform.position.z);
     }
 
     void ShiftPlayerForward()
     {
-		transform.position = new Vector3(Mathf.Lerp(transform.position.x, startPoint.transform.position.x, Time.deltaTime * speed),
+		transform.position = new Vector3(Mathf.Lerp(transform.position.x, startPoint.transform.position.x, Time.deltaTime * playerShiftSpeed),
 													transform.position.y,
 													transform.position.z);
 	}
 
 	void ShiftPlayerToDeath()
 	{
-		transform.position = new Vector3(Mathf.Lerp(transform.position.x, deathPoint.transform.position.x, Time.deltaTime * speed),
+		transform.position = new Vector3(Mathf.Lerp(transform.position.x, deathPoint.transform.position.x, Time.deltaTime * playerShiftSpeed),
 													transform.position.y,
 													transform.position.z);
 	}

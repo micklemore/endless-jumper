@@ -45,8 +45,16 @@ public class AudioManager : MonoBehaviour
 	{
 		EventHandler.instance.startGameDelegate += PlayGameMusic;
 		EventHandler.instance.endGameDelegate += PlayGameOverAudio;
+		EventHandler.instance.pauseButtonClickedDelegate += PauseAudio;
+		EventHandler.instance.resumeButtonClickedDelegate += ResumeAudio;
 
-		shouldPlayGameMusic = PlayerPrefs.GetInt("GameAudio") == 1;
+		shouldPlayGameMusic = PlayerPrefs.GetInt("GameMusic") == 1;
+		shouldPlayEffectsAudio = PlayerPrefs.GetInt("EffectsAudio") == 1;
+	}
+
+	void Update()
+	{
+		shouldPlayGameMusic = PlayerPrefs.GetInt("GameMusic") == 1;
 		shouldPlayEffectsAudio = PlayerPrefs.GetInt("EffectsAudio") == 1;
 	}
 
@@ -63,7 +71,10 @@ public class AudioManager : MonoBehaviour
 	{
         if (shouldPlayGameMusic)
         {
-			Destroy(gameMusic.gameObject);
+			if (gameMusic != null)
+			{
+				Destroy(gameMusic.gameObject);
+			}
 			PlaySpecificAudioSource(gameOverAudioSource);
 		}
 	}
@@ -96,5 +107,32 @@ public class AudioManager : MonoBehaviour
 	{
 		actualAudioSource = Instantiate(audioSource, new Vector3(0, 0, 0), Quaternion.identity);
 		actualAudioSource.PlayOneShot(audioSource.clip, audioSource.volume);
+	}
+
+	void PauseAudio()
+	{
+		if (actualAudioSource != null)
+		{
+			actualAudioSource.Pause();
+		}
+		if (gameMusic != null)
+		{
+			gameMusic.Pause();
+		}
+	}
+
+	void ResumeAudio()
+	{
+		if (shouldPlayGameMusic)
+		{
+			if (gameMusic != null)
+			{
+				gameMusic.UnPause();
+			}
+			else
+			{
+				PlayGameMusic();
+			}
+		}
 	}
 }
