@@ -8265,8 +8265,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   secondsToReturnToStartPosition: 3
-  obstacleMinSpawnTimer: 1
-  obstacleMaxSpawnTimer: 3
+  obstacleMinSpawnTimer: 0.8
+  obstacleMaxSpawnTimer: 1.6
 --- !u!4 &2057149149
 Transform:
   m_ObjectHideFlags: 0

@@ -40,6 +40,8 @@ public class Player : MonoBehaviour
 
 	bool isFalling = false;
 
+	bool isShiftingBack = false;
+
 	Animator playerAnimator;
 
 	void Start()
@@ -82,7 +84,7 @@ public class Player : MonoBehaviour
 
 	void CheckIfRayTraceIsNeededToDetectObstacles()
 	{
-		if (isJumping && haveToRaycast)
+		if (isJumping && haveToRaycast && !isShiftingBack)
 		{
 			PerformRaycastToDetectObstacles();
 		}
@@ -99,15 +101,12 @@ public class Player : MonoBehaviour
 		
 		if (hit.collider != null)
 		{
-			//Debug.Log("collider != null");
 			if (hit.collider.gameObject.GetComponent<Obstacle>() != null)
 			{
 				lastRaycastHit = true;
-				//Debug.Log("raycast with obstacle");
 			}
 			else
 			{
-				//Debug.Log("non ho fatto collision con obstacle");
 				if (lastRaycastHit)
 				{
 					haveToRaycast = false;
@@ -163,6 +162,7 @@ public class Player : MonoBehaviour
 		AudioManager.instance.PlayHurtAudio();
 		SetAnimatorParameter("IsHit", true);
 		haveToShiftPlayerBack = true;
+		isShiftingBack = true;
 
         yield return new WaitForSeconds(playerShiftSpeed);
 
@@ -182,6 +182,7 @@ public class Player : MonoBehaviour
     IEnumerator ShiftPlayerForwardCoroutine()
     {
 		haveToShiftPlayerForward = true;
+		isShiftingBack = false;
 		SetAnimatorParameter("IsReturningToStart", haveToShiftPlayerForward);
 
 		isFirstHit = true;
