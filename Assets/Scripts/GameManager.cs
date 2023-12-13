@@ -36,10 +36,6 @@ public class GameManager : MonoBehaviour
 	void Start()
 	{
 		EventHandler.instance.StartGameNotify();
-		EventHandler.instance.restartGameClickedDelegate += RestartGame;
-		EventHandler.instance.endGameDelegate += EndGame;
-		EventHandler.instance.pauseButtonClickedDelegate += PauseGame;
-		EventHandler.instance.resumeButtonClickedDelegate += ResumeGame;
 	}
 
 	public float GetSecondsToReturnToStartPosition()
@@ -65,13 +61,13 @@ public class GameManager : MonoBehaviour
 		return currentScore;
 	}
 
-	void RestartGame()
+	public void RestartGame()
 	{
 		Time.timeScale = 1;
 		SceneManager.LoadScene(0);
 	}
 
-	void EndGame(int score)
+	public void EndGame()
 	{
 		Time.timeScale = 0;
 	}

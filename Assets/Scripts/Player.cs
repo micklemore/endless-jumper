@@ -7,13 +7,13 @@ using UnityEngine.SceneManagement;
 public class Player : MonoBehaviour
 {
     [SerializeField]
-    GameObject backPoint;
+    Transform backPoint;
 
     [SerializeField]
-    GameObject startPoint;
+    Transform startPoint;
 
 	[SerializeField]
-	GameObject deathPoint;
+	Transform deathPoint;
 
 	[SerializeField]
 	float jumpForce;
@@ -42,6 +42,8 @@ public class Player : MonoBehaviour
 
 	bool isShiftingBack = false;
 
+	bool hasLiftedFinger = false;
+
 	Animator playerAnimator;
 
 	void Start()
@@ -57,7 +59,9 @@ public class Player : MonoBehaviour
 	{
 		CheckIfFalling();
 
-		TryToJump();
+		TryToJumpWithSpacebar();
+
+		TryToJumpWithTouch();
 
 		CheckIfRayTraceIsNeededToDetectObstacles();
 
@@ -133,16 +137,43 @@ public class Player : MonoBehaviour
         }
     }
 
-	void TryToJump()
+	void TryToJumpWithTouch()
+	{
+		if (Input.touchCount > 0)
+		{
+			Touch touch = Input.GetTouch(0);
+
+			if (!isJumping && touch.phase == TouchPhase.Began)
+			{
+				Jump();
+				haveToRaycast = true;
+				hasLiftedFinger = false;
+			}
+			else if (isJumping)
+			{
+				if (hasLiftedFinger && (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary))
+				{
+					rigidBody2d.gravityScale = startGravity + 5;
+				}
+			}
+			if (touch.phase == TouchPhase.Ended)
+			{
+				rigidBody2d.gravityScale = startGravity;
+				hasLiftedFinger = true;
+			}
+		}
+	}
+
+	void TryToJumpWithSpacebar()
 	{
 		if (!isJumping)
 		{
 			if (Input.GetKeyDown(KeyCode.Space))
 			{
 				Jump();
-				
+
 				haveToRaycast = true;
-			} 
+			}
 		}
 		else
 		{
@@ -159,7 +190,7 @@ public class Player : MonoBehaviour
 
 	IEnumerator ShiftPlayerBackCoroutine()
     {
-		AudioManager.instance.PlayHurtAudio();
+		EventHandler.instance.PlayHurtAudioNotify();
 		SetAnimatorParameter("IsHit", true);
 		haveToShiftPlayerBack = true;
 		isShiftingBack = true;
@@ -196,7 +227,7 @@ public class Player : MonoBehaviour
     
 	IEnumerator EndGameCoroutine()
 	{
-		AudioManager.instance.PlayDeathAudio();
+		EventHandler.instance.PlayDeathAudioNotify();
 		SetAnimatorParameter("IsHit", true);
 		haveToShiftPlayerToDeath = true;
 
@@ -245,7 +276,7 @@ public class Player : MonoBehaviour
 		rigidBody2d.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
 		isJumping = true;
 		SetAnimatorParameter("IsJumping", isJumping);
-		AudioManager.instance.PlayJumpAudio();
+		EventHandler.instance.PlayJumpAudioNotify();
 	}
 
 	void Landed()

@@ -30,6 +30,7 @@ public class EventHandler : MonoBehaviour
     public void EndGameNotify()
     {
 		endGameDelegate?.Invoke(GameManager.instance.GetCurrentScore());
+        GameManager.instance.EndGame();
     }
 
     public delegate void OnStartGame();
@@ -40,20 +41,13 @@ public class EventHandler : MonoBehaviour
         startGameDelegate?.Invoke();
     }
 
-    public delegate void RestartGameClicked();
-    public RestartGameClicked restartGameClickedDelegate;
-
-    public void OnRestartGameClicked()
-    {
-        restartGameClickedDelegate?.Invoke();
-    }
-
     public delegate void PauseButtonClicked();
     public PauseButtonClicked pauseButtonClickedDelegate;
 
     public void OnPauseButtonClicked()
     {
         pauseButtonClickedDelegate?.Invoke();
+        GameManager.instance.PauseGame();
 	}
 
     public delegate void ResumeButtonClicked();
@@ -62,5 +56,30 @@ public class EventHandler : MonoBehaviour
     public void OnResumeButtonClicked()
     {
         resumeButtonClickedDelegate?.Invoke();
+        GameManager.instance.ResumeGame();
     }
+
+    public delegate void PlayJumpAudio();
+    public PlayJumpAudio playJumpAudioDelegate;
+
+    public void PlayJumpAudioNotify()
+    {
+        playJumpAudioDelegate?.Invoke();
+    }
+
+	public delegate void PlayHurtAudio();
+	public PlayHurtAudio playHurtAudioDelegate;
+
+	public void PlayHurtAudioNotify()
+	{
+		playHurtAudioDelegate?.Invoke();
+	}
+
+	public delegate void PlayDeathAudio();
+	public PlayDeathAudio playDeathAudioDelegate;
+
+	public void PlayDeathAudioNotify()
+	{
+		playDeathAudioDelegate?.Invoke();
+	}
 }

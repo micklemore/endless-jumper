@@ -14,13 +14,8 @@ public class Obstacle : MonoBehaviour
 		MoveObstacle();
 	}
 
-	void OnBecameInvisible()
-    {
-        Destroy(gameObject);
-    }
-
     void MoveObstacle()
     {
-        transform.position -= Vector3.right * speed * Time.deltaTime;
+        transform.Translate(Vector3.left * speed * Time.deltaTime);
     }
 }

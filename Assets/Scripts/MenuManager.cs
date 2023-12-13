@@ -10,10 +10,10 @@ public class MenuManager : MonoBehaviour
     Button optionsButton;
 
     [SerializeField]
-    GameObject mainMenu;
+    MainMenu mainMenu;
 
     [SerializeField]
-    GameObject optionsMenu;
+    OptionsMenu optionsMenu;
 
     public static MenuManager instance;
 	void Awake()
@@ -43,13 +43,13 @@ public class MenuManager : MonoBehaviour
 
     void OptionsMenuClicked()
     {
-        mainMenu.SetActive(false);
-        optionsMenu.SetActive(true);
+        mainMenu.gameObject.SetActive(false);
+        optionsMenu.gameObject.SetActive(true);
     }
 
     public void OnBackButtonPressed()
     {
-		optionsMenu.SetActive(false);
-		mainMenu.SetActive(true);
+		optionsMenu.gameObject.SetActive(false);
+		mainMenu.gameObject.SetActive(true);
 	}
 }

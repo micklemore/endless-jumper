@@ -22,8 +22,6 @@ public class AudioManager : MonoBehaviour
 	[SerializeField]
 	AudioSource deathAudioSource;
 
-	public static AudioManager instance;
-
 	AudioSource actualAudioSource;
 
 	AudioSource gameMusic;
@@ -32,21 +30,15 @@ public class AudioManager : MonoBehaviour
 
 	bool shouldPlayEffectsAudio = true;
 
-	void Awake()
-	{
-		if (instance != null)
-		{
-			Destroy(this);
-		}
-		instance = this;
-	}
-
 	void Start()
 	{
 		EventHandler.instance.startGameDelegate += PlayGameMusic;
 		EventHandler.instance.endGameDelegate += PlayGameOverAudio;
 		EventHandler.instance.pauseButtonClickedDelegate += PauseAudio;
 		EventHandler.instance.resumeButtonClickedDelegate += ResumeAudio;
+		EventHandler.instance.playJumpAudioDelegate += PlayJumpAudio;
+		EventHandler.instance.playHurtAudioDelegate += PlayHurtAudio;
+		EventHandler.instance.playDeathAudioDelegate += PlayDeathAudio;
 
 		shouldPlayGameMusic = PlayerPrefs.GetInt("GameMusic") == 1;
 		shouldPlayEffectsAudio = PlayerPrefs.GetInt("EffectsAudio") == 1;

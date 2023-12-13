@@ -1855,8 +1855,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   optionsButton: {fileID: 7128878732975255467}
-  mainMenu: {fileID: 1201806822}
-  optionsMenu: {fileID: 1893714698}
+  mainMenu: {fileID: 1201806824}
+  optionsMenu: {fileID: 1893714700}
 --- !u!1 &2112109569
 GameObject:
   m_ObjectHideFlags: 0

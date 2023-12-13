@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-public class UI : MonoBehaviour
+public class UI : Menu
 {
     [SerializeField]
     GameObject gameOverView;
@@ -30,13 +30,13 @@ public class UI : MonoBehaviour
     Button pauseButton;
 
     [SerializeField]
-    GameObject pauseMenu;
+    PauseMenu pauseMenu;
 
     [SerializeField]
     Button optionsButton;
 
     [SerializeField]
-    GameObject optionsMenu;
+    OptionsMenu optionsMenu;
 
     public static UI instance;
 
@@ -115,30 +115,31 @@ public class UI : MonoBehaviour
 
 	public void RestartGameClicked()
     {
-        EventHandler.instance.OnRestartGameClicked();
-    }
+		GameManager.instance.RestartGame();
+	}
 
-    void PauseButtonClicked()
+	void PauseButtonClicked()
     {
 		EventHandler.instance.OnPauseButtonClicked();
-        pauseMenu.SetActive(true);
+        pauseMenu.gameObject.SetActive(true);
+        //chiama la funzione di inizializzazione
 	}
 
     public void ResumeButtonClicked()
     {
 		EventHandler.instance.OnResumeButtonClicked();
-		pauseMenu.SetActive(false);
+		pauseMenu.gameObject.SetActive(false);
 	}
 
     void OptionsButtonClicked()
     {
-        pauseMenu.SetActive(false);
-        optionsMenu.SetActive(true);
+        pauseMenu.gameObject.SetActive(false);
+        optionsMenu.gameObject.SetActive(true);
     }
 
     public void OnBackButtonPressed()
     {
-        optionsMenu.SetActive(false);
-        pauseMenu.SetActive(true);
+        optionsMenu.gameObject.SetActive(false);
+        pauseMenu.gameObject.SetActive(true);
     }
 }

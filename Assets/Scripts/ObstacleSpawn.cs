@@ -6,10 +6,10 @@ using UnityEngine;
 public class ObstacleSpawn : MonoBehaviour
 {
 	[SerializeField]
-    GameObject obstacleSpawnPoint;
+    Transform obstacleSpawnPoint;
 
 	[SerializeField]
-	GameObject obstacle;
+	Obstacle obstacle;
 
 	float currentTimer = 0;
 
